@@ -2,11 +2,29 @@
 
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
 import { EmotionProfile, analyzeEmotion } from "@/lib/emotion";
 
 const UniverseCanvas = dynamic(() => import("@/components/UniverseCanvas"), { ssr: false });
+
+type SpeechRecognitionResultLike = {
+  0: { transcript: string };
+};
+
+type SpeechRecognitionEventLike = {
+  results: Array<SpeechRecognitionResultLike>;
+};
+
+type SpeechRecognitionLike = {
+  lang: string;
+  onstart: (() => void) | null;
+  onend: (() => void) | null;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  start: () => void;
+};
+
+type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
 
 export default function Home() {
   const [text, setText] = useState("");
@@ -18,17 +36,21 @@ export default function Home() {
 
   useEffect(() => {
     synth.current = new Tone.PolySynth(Tone.Synth).toDestination();
-    return () => synth.current?.dispose();
+    return () => {
+      synth.current?.dispose();
+      synth.current = null;
+    };
   }, []);
 
   useEffect(() => {
+    setPhase(0);
     const id = setInterval(() => setPhase((p) => (p < 3 ? p + 0.02 : 3)), 120);
     return () => clearInterval(id);
   }, [profile.seed]);
 
   useEffect(() => {
     if (!synth.current) return;
-    Tone.start();
+    void Tone.start();
     const map: Record<string, string[]> = {
       happy: ["C4", "E4", "G4", "B4"],
       sad: ["A3", "C4", "E4", "G4"],
@@ -47,27 +69,35 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text })
       });
-      setProfile(await res.json());
+      if (!res.ok) throw new Error("Emotion request failed");
+      const data = (await res.json()) as EmotionProfile;
+      setProfile(data);
     } catch {
       setProfile(analyzeEmotion(text));
     }
   };
 
   const startVoice = () => {
-    const Rec = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    const w = window as Window & {
+      webkitSpeechRecognition?: SpeechRecognitionCtor;
+      SpeechRecognition?: SpeechRecognitionCtor;
+    };
+
+    const Rec = w.webkitSpeechRecognition ?? w.SpeechRecognition;
     if (!Rec) return;
+
     const recognition = new Rec();
     recognition.lang = "en-US";
     recognition.onstart = () => setListening(true);
     recognition.onend = () => setListening(false);
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setText(transcript);
     };
     recognition.start();
   };
 
-  const snapshot = useMemo(() => () => {
+  const snapshot = useCallback(() => {
     const canvas = document.querySelector("canvas");
     if (!canvas) return;
     const url = canvas.toDataURL("image/png");
@@ -88,7 +118,6 @@ export default function Home() {
       }
     >
       <UniverseCanvas profile={profile} phase={phase} pointer={pointer} />
-
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -97,7 +126,6 @@ export default function Home() {
       >
         Your emotion shapes reality
       </motion.h1>
-
       <div className="glass shadow-neon absolute left-1/2 top-1/2 w-[min(92vw,680px)] -translate-x-1/2 -translate-y-1/2 rounded-3xl p-5">
         <input
           value={text}
@@ -106,24 +134,12 @@ export default function Home() {
           className="w-full bg-transparent text-center text-lg outline-none placeholder:text-slate-300/40"
         />
         <div className="mt-4 flex items-center justify-center gap-3">
-          <button onClick={submitEmotion} className="rounded-full border border-cyan-300/50 px-4 py-2 text-sm hover:bg-cyan-300/10">
-            Generate Universe
-          </button>
-          <button onClick={startVoice} className="rounded-full border border-fuchsia-300/50 px-4 py-2 text-sm hover:bg-fuchsia-300/10">
-            {listening ? "Listening..." : "Voice Input"}
-          </button>
-          <button onClick={snapshot} className="rounded-full border border-emerald-300/50 px-4 py-2 text-sm hover:bg-emerald-300/10">
-            Export Snapshot
-          </button>
+          <button onClick={submitEmotion} className="rounded-full border border-cyan-300/50 px-4 py-2 text-sm hover:bg-cyan-300/10">Generate Universe</button>
+          <button onClick={startVoice} className="rounded-full border border-fuchsia-300/50 px-4 py-2 text-sm hover:bg-fuchsia-300/10">{listening ? "Listening..." : "Voice Input"}</button>
+          <button onClick={snapshot} className="rounded-full border border-emerald-300/50 px-4 py-2 text-sm hover:bg-emerald-300/10">Export Snapshot</button>
         </div>
       </div>
-
-      <motion.p
-        key={profile.poeticLine}
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass absolute bottom-12 left-1/2 -translate-x-1/2 rounded-full px-6 py-3 text-sm text-slate-100/90"
-      >
+      <motion.p key={profile.poeticLine} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="glass absolute bottom-12 left-1/2 -translate-x-1/2 rounded-full px-6 py-3 text-sm text-slate-100/90">
         {profile.poeticLine}
       </motion.p>
     </main>
