@@ -1,0 +1,61 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(800 450) rotate(90) scale(420 760)">
+      <stop offset="0" stop-color="#1B235D" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#3A1E67" stop-opacity="0.7"/>
+      <stop offset="0.75" stop-color="#0A1C34" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#03040B"/>
+    </radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="panelBlur" x="0" y="0" width="1600" height="900"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="#02030A"/>
+  <rect width="1600" height="900" fill="url(#bg1)"/>
+
+  <!-- Particle cloud -->
+  <g opacity="0.95" filter="url(#glow)">
+    <circle cx="800" cy="440" r="3" fill="#22D3EE"/>
+    <circle cx="730" cy="400" r="2.5" fill="#A855F7"/>
+    <circle cx="920" cy="470" r="2.5" fill="#60A5FA"/>
+    <circle cx="870" cy="360" r="2" fill="#34D399"/>
+    <circle cx="680" cy="500" r="2.8" fill="#F59E0B"/>
+    <circle cx="990" cy="420" r="2" fill="#F43F5E"/>
+    <circle cx="600" cy="430" r="2" fill="#7DD3FC"/>
+    <circle cx="1060" cy="510" r="2" fill="#C4B5FD"/>
+    <circle cx="790" cy="320" r="2" fill="#FDE047"/>
+    <circle cx="770" cy="560" r="2" fill="#22D3EE"/>
+    <circle cx="540" cy="520" r="2" fill="#A855F7"/>
+    <circle cx="1130" cy="390" r="2" fill="#60A5FA"/>
+    <circle cx="455" cy="450" r="1.6" fill="#F59E0B"/>
+    <circle cx="1180" cy="450" r="1.6" fill="#34D399"/>
+    <circle cx="635" cy="335" r="1.6" fill="#22D3EE"/>
+    <circle cx="970" cy="595" r="1.6" fill="#A855F7"/>
+  </g>
+
+  <!-- Title -->
+  <text x="800" y="110" text-anchor="middle" fill="#DDF4FF" font-size="50" font-family="Inter, Arial, sans-serif" letter-spacing="4">Your emotion shapes reality</text>
+
+  <!-- Glass input panel -->
+  <g>
+    <rect x="430" y="355" width="740" height="180" rx="32" fill="rgba(16,20,35,0.5)" stroke="rgba(147,197,253,0.4)"/>
+    <rect x="426" y="351" width="748" height="188" rx="35" stroke="rgba(56,189,248,0.25)"/>
+    <text x="800" y="420" text-anchor="middle" fill="rgba(226,232,240,0.7)" font-size="32" font-family="Inter, Arial, sans-serif">Tell the universe how you feel...</text>
+
+    <rect x="560" y="468" width="210" height="48" rx="24" fill="rgba(8,12,24,0.65)" stroke="rgba(56,189,248,0.9)"/>
+    <text x="665" y="499" text-anchor="middle" fill="#E8F6FF" font-size="22" font-family="Inter, Arial, sans-serif">Generate Universe</text>
+
+    <rect x="795" y="468" width="170" height="48" rx="24" fill="rgba(8,12,24,0.65)" stroke="rgba(217,70,239,0.9)"/>
+    <text x="880" y="499" text-anchor="middle" fill="#E8F6FF" font-size="22" font-family="Inter, Arial, sans-serif">Voice Input</text>
+
+    <rect x="985" y="468" width="190" height="48" rx="24" fill="rgba(8,12,24,0.65)" stroke="rgba(52,211,153,0.9)"/>
+    <text x="1080" y="499" text-anchor="middle" fill="#E8F6FF" font-size="22" font-family="Inter, Arial, sans-serif">Export Snapshot</text>
+  </g>
+
+  <!-- Poetic output -->
+  <rect x="600" y="790" width="400" height="52" rx="26" fill="rgba(16,20,35,0.5)" stroke="rgba(147,197,253,0.4)"/>
+  <text x="800" y="823" text-anchor="middle" fill="#E6F0FF" font-size="24" font-family="Inter, Arial, sans-serif">There is warmth in your thoughts.</text>
+</svg>
